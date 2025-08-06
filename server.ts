@@ -3,6 +3,7 @@ import { ReadStream } from "fs";
 import mongoose, { model, Schema } from "mongoose";
 
 const app: Application = express();
+const port =  4000;
 
 mongoose
   .connect("mongodb://localhost:27017/internsD")
@@ -93,34 +94,52 @@ app.post("/login", async (req: Request, res: Response) => {
 });
 
 app.patch("/update-user", async (req: Request, res: Response) => {
-  try {
-    const { name, email, password } = req.body as Partial<User>;
-    const updateUser = await User.findByIdAndUpdate(
-      req.params.id,
-      { name, email, password },
-      { new: true }
-    );
+    
+    try {
+        const {name, email, password} = req.body as Partial<User>
+        const updateUser = await User.findByIdAndUpdate(req.params.id, {name, email, password}, {new: true})
 
-    if (!updateUser) {
-      return res.status(404).json({ message: "User not found" });
+        if(!updateUser) {
+            return res.status(404).json({message: 'User not found'})
+        }
+
+        res.status(200).json({message: "User updated successfuly", updateUser})
+    } catch (err: any) {
+        res.status(500).json({ message: "An error occurred", err: err.message });
     }
-
-    res.status(200).json({ message: "User updated successfuly", updateUser });
-  } catch (err: any) {
-    res.status(500).json({ message: "An error occurred", err: err.message });
-  }
-});
+})
 
 app.delete("/delete-user/:id", async (req: Request, res: Response) => {
-  try {
-    const Findusertodelete = await User.findByIdAndDelete(req.params.id);
+    try {
 
-    if (!Findusertodelete) {
-      return res.status(404).json({ message: "User not found" });
+        const Findusertodelete = await User.findByIdAndDelete(req.params.id)
+
+        if(!Findusertodelete) {
+            return res.status(404).json({message: "User not found"})
+        }
+
+        res.status(200).json({message: "User deleted successfully"})
+    } catch (err: any) {
+        res.status(500).json({message: "An error occurred", err: err.message})
     }
+})
 
-    res.status(200).json({ message: "User deleted successfully" });
-  } catch (err: any) {
-    res.status(500).json({ message: "An error occurred", err: err.message });
-  }
-});
+app.delete("/delete-every", async (req: Request, res: Response) => {
+    try {
+        await User.deleteMany()
+        res.status(200).json({message: "Users deleted successfuly"})
+        
+    } catch (err: any) {
+        res.status(500).json({message: "An error occurred", err: err.message})
+    }
+})
+
+
+// app.all("*", async (req: Request, res: Response) => {
+//     res.status(404).json({message: "No Routes matched"})
+// })
+
+
+app.listen(port, () => {
+    console.log(`Listening to http://localhost:${port}`)
+})
