@@ -134,12 +134,6 @@ app.delete("/delete-every", async (req: Request, res: Response) => {
     }
 })
 
-
-// app.all("*", async (req: Request, res: Response) => {
-//     res.status(404).json({message: "No Routes matched"})
-// })
-
-
 app.listen(port, () => {
     console.log(`Listening to http://localhost:${port}`)
 })
